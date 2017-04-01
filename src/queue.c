@@ -1,6 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "queue.h"
-#include "../Process.h"
 
 typedef struct node {
     Process     *process;
@@ -9,7 +9,7 @@ typedef struct node {
 
 typedef struct queue {
     Node    *head,
-            *tail:
+            *tail;
     int     length;
 } Queue;
 
@@ -36,11 +36,39 @@ void insert_process(Queue *queue, Process *process) {
     queue->length++;
 }
 
-Process *take_first_process(Queue *queue) {
+Process *pop_first_process(Queue *queue) {
     Node *node = queue->head;
     Process *process = node->process;
     queue->head = node->next;
     free(node);
-    queue--;
+    queue->length--;
     return process;
+}
+
+Process *take_first_process(Queue *queue) {
+    return queue->head->process;
+}
+
+int length(Queue *queue) {
+    return queue->length;
+}
+
+void destroy_queue(Queue *queue) {
+    Process *process;
+    while (length(queue) != 0) {
+        process = pop_first_process(queue);
+        destroy_process(process);
+    }
+    free(queue);
+}
+
+void print_queue(Queue *queue) {
+    int i = 0;
+    Node *node = queue->head;
+    while (i < queue->length) {
+        Process *process = node->process;
+        printf("%s %d: %d\n", process->name, process->pid, get_running_time(process));
+        node = node->next;
+        i++;
+    }
 }
