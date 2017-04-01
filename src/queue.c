@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "queue.h"
 
 typedef struct node {
@@ -42,6 +43,24 @@ Process *pop_first_process(Queue *queue) {
     queue->head = node->next;
     free(node);
     queue->length--;
+    return process;
+}
+
+Process *pop_random_process(Queue *queue) {
+    int index = time(NULL) % queue->length;
+    if (index == 0) { return pop_first_process(queue); }
+    Node *parent = queue->head;
+    Node *node = queue->head->next;
+    while (index > 1) {
+        parent = node;
+        node = node->next;
+        index--;
+    }
+    queue->length--;
+    Process *process = node->process;
+    parent->next = node->next;
+    if (parent->next == NULL) { queue->tail = parent; }
+    free(node);
     return process;
 }
 

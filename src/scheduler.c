@@ -19,10 +19,16 @@ void change_process_if_ready(   Queue *ready_queue,
                                 Queue *waiting_list,
                                 Queue *dead_list,
                                 Process **process_add,
-                                int t) {
+                                int t,
+                                Scheduler scheduler) {
 
-    *process_add = (length(ready_queue) == 0) ?  create_idle_process(t)
-                                            : pop_first_process(ready_queue);
+    if (length(ready_queue) == 0) {
+        *process_add = create_idle_process(t);
+    }
+    else {
+        *process_add = (scheduler != RANDOM) ? pop_first_process(ready_queue)
+                                            : pop_random_process(ready_queue);
+    }
 
     update_state(*process_add, RUNNING);
     while (get_running_time(*process_add) == 0) {
@@ -35,8 +41,13 @@ void change_process_if_ready(   Queue *ready_queue,
             update_state(*process_add, DEAD);
             insert_process(dead_list, *process_add);
         }
-        *process_add = (length(ready_queue) == 0) ?  create_idle_process(t)
-                                            :   pop_first_process(ready_queue);
+        if (length(ready_queue) == 0) {
+            *process_add = create_idle_process(t);
+        }
+        else {
+            *process_add = (scheduler != RANDOM) ? pop_first_process(ready_queue)
+                                                : pop_random_process(ready_queue);
+        }
     }
 }
 
@@ -78,14 +89,15 @@ void update_ready_queue(Queue *ready_queue) {
     }
 }
 
-void FCFS(  Queue *ready_queue,
-            Queue *waiting_list,
-            Queue *dead_list,
-            Process **process,
-            int simulation_time) {
+void fcfs_or_random(Queue *ready_queue,
+                    Queue *waiting_list,
+                    Queue *dead_list,
+                    Process **process,
+                    int simulation_time,
+                    Scheduler scheduler) {
 
     if (*process == NULL) {
-        change_process_if_ready(ready_queue, waiting_list, dead_list, process, simulation_time);
+        change_process_if_ready(ready_queue, waiting_list, dead_list, process, simulation_time, scheduler);
     }
     else {
         if (get_running_time(*process) == 0) {
@@ -100,7 +112,7 @@ void FCFS(  Queue *ready_queue,
                 update_state(*process, DEAD);
                 insert_process(dead_list, *process);
             }
-            change_process_if_ready(ready_queue, waiting_list, dead_list, process, simulation_time);
+            change_process_if_ready(ready_queue, waiting_list, dead_list, process, simulation_time, scheduler);
         }
     }
 }
@@ -114,12 +126,12 @@ void round_robin(   Queue *ready_queue,
                     Queue *waiting_list,
                     Queue *dead_list,
                     Process **process,
-                    int *simulation_time,
-                    int *simulation_quantum,
+                    unsigned int *simulation_time,
+                    unsigned int *simulation_quantum,
                     int quantum) {
 
     if (*process == NULL) {
-        change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time);
+        change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time, ROUND_ROBIN);
         *simulation_quantum = calculate_quantum(*process, quantum);
     }
     else {
@@ -135,13 +147,13 @@ void round_robin(   Queue *ready_queue,
                 update_state(*process, DEAD);
                 insert_process(dead_list, *process);
             }
-            change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time);
+            change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time, ROUND_ROBIN);
             *simulation_quantum = calculate_quantum(*process, quantum);
         }
         else if (*simulation_quantum == 0 && get_running_time(*process) != 0) {
             update_state(*process, READY);
             insert_process(ready_queue, *process);
-            change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time);
+            change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time, ROUND_ROBIN);
             *simulation_quantum = calculate_quantum(*process, quantum);
         }
         else if (*simulation_quantum != 0 && get_running_time(*process) == 0) {
@@ -153,7 +165,7 @@ void round_robin(   Queue *ready_queue,
                 update_state(*process, DEAD);
                 insert_process(dead_list, *process);
             }
-            change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time);
+            change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time, ROUND_ROBIN);
             *simulation_quantum = calculate_quantum(*process, quantum);
         }
     }

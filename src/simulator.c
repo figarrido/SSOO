@@ -7,15 +7,20 @@
 #define TRUE 1
 #define FALSE 0
 
+Queue   *ready_queue,
+        *waiting_list,
+        *dead_list;
+
 void simulate(Queue *processes, Scheduler scheduler, int quantum) {
-    Queue *ready_queue = create_queue();
-    Queue *waiting_list = create_queue();
-    Queue *dead_list = create_queue();
+    ready_queue = create_queue();
+    waiting_list = create_queue();
+    dead_list = create_queue();
     unsigned int    simulation_time = 0,
                     simulation_quantum;
     Process *process = NULL;
 
     while (TRUE) {
+        printf("%d\n", simulation_time);
         // printf("=======================================================================\n");
         // if (process != NULL) printf("%d itereación, process: %s %d\n", simulation_time, process->name, get_running_time(process));
         put_process_in_ready(waiting_list, ready_queue, 0, WITH_WAITING_TIME);
@@ -23,11 +28,14 @@ void simulate(Queue *processes, Scheduler scheduler, int quantum) {
         // printf("READY:\n");
         // print_queue(ready_queue);
 
-        if (scheduler == FCOME_FSERVED)
-            FCFS(ready_queue, waiting_list, dead_list, &process, simulation_time);
-        else
+        if (scheduler == FCFS || scheduler == RANDOM)
+            fcfs_or_random(ready_queue, waiting_list, dead_list, &process, simulation_time, scheduler);
+        else if (scheduler == ROUND_ROBIN)
             round_robin(ready_queue, waiting_list, dead_list, &process, &simulation_time, &simulation_quantum, quantum);
-
+        else {
+            printf("Posibles Schedulers: fcfs roundrobin random\n");
+            exit(1);
+        }
         // printf("\nWAITING:\n");
         // print_queue(waiting_list);
         // printf("\n");
@@ -99,7 +107,10 @@ int main(int argc, char const *argv[]) {
         pid++;
     }
 
-    Scheduler scheduler = (!strcmp(argv[1], "FCFS")) ? FCOME_FSERVED : ROUND_ROBIN;
+    Scheduler scheduler;
+    if (!strcmp(argv[1], "fcfs")) { scheduler = FCFS; }
+    else if (!strcmp(argv[1], "roundrobin")) { scheduler = ROUND_ROBIN; }
+    else if (!strcmp(argv[1], "random")) { scheduler = RANDOM; }
 
     simulate(processes, scheduler, quantum);
 

@@ -1,7 +1,7 @@
 #include "queue.h"
 
 typedef enum { WITH_INITIAL_TIME, WITH_WAITING_TIME } Comparison;
-typedef enum { FCOME_FSERVED, ROUND_ROBIN, RANDOM } Scheduler;
+typedef enum { FCFS, ROUND_ROBIN, RANDOM } Scheduler;
 
 void put_process_in_ready(  Queue *,
                             Queue *,
@@ -13,20 +13,22 @@ void change_process_if_ready(   Queue *,
                                 Queue *,
                                 Queue *,
                                 Process **,
-                                int);
+                                int,
+                                Scheduler);
 
-void FCFS(  Queue *,
-            Queue *,
-            Queue *,
-            Process **,
-            int);
+void fcfs_or_random(Queue *,
+                    Queue *,
+                    Queue *,
+                    Process **,
+                    int,
+                    Scheduler);
 
 void round_robin(   Queue *,
                     Queue *,
                     Queue *,
                     Process **,
-                    int *,
-                    int *,
+                    unsigned int *,
+                    unsigned int *,
                     int);
 
 int calculate_quantum(Process *, int);

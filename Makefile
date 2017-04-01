@@ -1,5 +1,5 @@
 DIR = src
-CFLAGS = -I.
+CFLAGS = -Wall -I.
 
 compile: $(DIR)/*.c
 	gcc -o simulator $(DIR)/*.c $(CFLAGS)
