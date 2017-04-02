@@ -37,7 +37,11 @@ En el archivo `simulator.c`, linea 8, está la línea `#define RUN_SLOW` que con
 
 En el output se ve el número de simulación en la que está la simulación y abajo el procesos que está actualmente en la CPU y la cantidad de intervalos completados comparado con los totales (completados/totales). Luego tabulado se presentan los cambios que se realizan durante el ciclo.
 La manera en que se presenta la información se encuentra entre `[]` y puede tener los siguientes valores:
+
 * `[NUEVO] nombre_del_proceso`: cuando el proceso valor del tiempo inicial que está en la cola `processes` tiene el mismo valor que el número de la simulación.
+
 * `[CAMBIO DE ESTADO] nombre_del_proceso {ESTADO_ANTERIOR -> NUEVO_ESTADO}`: cada vez que el proceso cambia de estado entre los posibles estados (`READY`, `WAITING`, `RUNNING`).
+
 * `[ELECCIÓN] nombre_del_proceso`: cuando un nuevo proceso ingresa en la CPU.
+
 * `[TERMINADO] nombre_del_proceso`: cuando un proceso termina.
