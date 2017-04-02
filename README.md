@@ -45,3 +45,5 @@ La manera en que se presenta la información se encuentra entre `[]` y puede ten
 * `[ELECCIÓN] nombre_del_proceso`: cuando un nuevo proceso ingresa en la CPU.
 
 * `[TERMINADO] nombre_del_proceso`: cuando un proceso termina.
+
+Dentro de las estadísticas no se muestran las estadísticas del proceso `idle`.
