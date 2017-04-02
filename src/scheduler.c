@@ -163,7 +163,10 @@ void round_robin(   Queue *ready_queue,
             *simulation_quantum = calculate_quantum(*process, quantum);
         }
         else if (*simulation_quantum != 0 && get_running_time(*process) == 0) {
-            if (!last_execution(*process)) {
+            if (get_pid(*process) == 1) {
+                destroy_process(*process);
+            }
+            else if (!last_execution(*process)) {
                 update_state(*process, WAITING);
                 insert_process(waiting_list, *process);
             }

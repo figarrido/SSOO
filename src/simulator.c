@@ -5,7 +5,7 @@
 
 #define TRUE 1
 #define FALSE 0
-#define RUN_SLOW TRUE
+#define RUN_SLOW FALSE
 
 unsigned int    simulation_time;
 Queue           *ready_queue,
