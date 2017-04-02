@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include "process.h"
 
+#define TRUE 1
+#define FALSE 0
+
 Process *create_process(int pid,
                         char *name,
                         int priority,
@@ -24,7 +27,10 @@ Process *create_process(int pid,
     process->index = 0;
     process->user_time = 0;
     process->idle_time = 0;
-
+    process->selected = 0;
+    process->blocked = 0;
+    process->response_time = 0;
+    process->responded = FALSE;
     return process;
 }
 
@@ -50,6 +56,38 @@ int get_priority(Process *process) {
     return process->priority;
 }
 
+int get_intervals(Process *process) {
+    return process->n_processes;
+}
+
+int get_index(Process *process) {
+    return process->index;
+}
+
+char *get_name(Process *process) {
+    return process->name;
+}
+
+int get_selected(Process *process) {
+    return process->selected;
+}
+int get_blocked(Process *process) {
+    return process->blocked;
+}
+int get_turnaround(Process *process) {
+    return process->user_time + process->idle_time;
+}
+int get_response_time(Process *process) {
+    return process->response_time;
+}
+int get_idle_time(Process *process) {
+    return process->idle_time;
+}
+
+int get_n_processes(Process *process) {
+    return process->n_processes;
+}
+
 int get_running_time(Process *process) {
     return process->running_array[process->index];
 }
@@ -65,9 +103,8 @@ int get_waiting_time(Process *process) {
 
 void update_idle_time(Process *process, int waiting) {
     process->idle_time++;
-    if (waiting) {
-        process->waiting_array[process->index]--;
-    }
+    if (waiting) { process->waiting_array[process->index]--; }
+    if (!(process->responded)) { process->response_time++; }
 }
 
 State get_state(Process *process) {
@@ -75,20 +112,31 @@ State get_state(Process *process) {
 }
 
 void update_state(Process *process, State state) {
-    if (process->state == NON_READY && state == READY)
-        printf("Proceso creado -> %s\n", process->name);
-    if (process->state == READY && state == RUNNING)
-        printf("Proceso a CPU -> %s\n", process->name);
-    if (process->state == RUNNING && state == WAITING)
-        printf("Proceso a esperar -> %s\n", process->name);
-    if (process->state == RUNNING && state == DEAD)
-        printf("Proceso terminado -> %s\n", process->name);
-    if ((process->state == WAITING || process->state == RUNNING) && state == READY)
-        printf("Proceso a ready -> %s\n", process->name);
 
-    if (process->state == WAITING && state == READY) {
+    if (process->state == NON_READY && state == READY) {
+        printf("\t[NUEVO] %s\n", get_name(process));
+    }
+    else if (process->state == READY && state == RUNNING) {
+        process->responded = TRUE;
+        process->selected++;
+        printf("\t[CAMBIO DE ESTADO] %s  {READY   ->  RUNNING}\n", get_name(process));
+    }
+    else if (process->state == RUNNING && state == WAITING) {
+        printf("\t[CAMBIO DE ESTADO] %s  {RUNNING ->  WAITING}\n", get_name(process));
+        process->blocked++;
+    }
+    else if (process->state == RUNNING && state == DEAD) {
+        printf("\t[TERMINADO] %s\n", get_name(process));
+    }
+    else if (process->state == WAITING && state == READY) {
+        printf("\t[CAMBIO DE ESTADO] %s  {WAITING ->  READY}\n", get_name(process));
         process->index++;
     }
+    else if (process->state == RUNNING && state == READY) {
+        printf("\t[CAMBIO DE ESTADO] %s  {RUNNING ->  READY}\n", get_name(process));
+        process->blocked++;
+    }
+
     process->state = state;
 }
 

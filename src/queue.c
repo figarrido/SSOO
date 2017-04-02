@@ -86,7 +86,7 @@ void print_queue(Queue *queue) {
     Node *node = queue->head;
     while (i < queue->length) {
         Process *process = node->process;
-        printf("%s %d: %d\n", process->name, process->pid, get_running_time(process));
+        printf("%s %d: %d\n", get_name(process), process->pid, get_running_time(process));
         node = node->next;
         i++;
     }

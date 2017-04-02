@@ -14,7 +14,6 @@ int process_in_time(Process *process, int t, Comparison comparison) {
     }
     return 0;
 }
-
 void change_process_if_ready(   Queue *ready_queue,
                                 Queue *waiting_list,
                                 Queue *dead_list,
@@ -24,15 +23,18 @@ void change_process_if_ready(   Queue *ready_queue,
 
     if (length(ready_queue) == 0) {
         *process_add = create_idle_process(t);
+        if (length(waiting_list) != 0) {
+            printf("\t[ELECCIÓN] %s\n", (*process_add)->name);
+        }
     }
     else {
         *process_add = (scheduler != RANDOM) ? pop_first_process(ready_queue)
                                             : pop_random_process(ready_queue);
+        printf("\t[ELECCIÓN] %s\n", (*process_add)->name);
     }
 
     update_state(*process_add, RUNNING);
     while (get_running_time(*process_add) == 0) {
-        printf("Entrando en change\n");
         if (!last_execution(*process_add)) {
             update_state(*process_add, WAITING);
             insert_process(waiting_list, *process_add);
@@ -43,10 +45,13 @@ void change_process_if_ready(   Queue *ready_queue,
         }
         if (length(ready_queue) == 0) {
             *process_add = create_idle_process(t);
+            printf("\t[ELECCIÓN] %s\n", (*process_add)->name);
+
         }
         else {
             *process_add = (scheduler != RANDOM) ? pop_first_process(ready_queue)
                                                 : pop_random_process(ready_queue);
+            printf("\t[ELECCIÓN] %s\n", (*process_add)->name);
         }
     }
 }
@@ -150,7 +155,8 @@ void round_robin(   Queue *ready_queue,
             change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time, ROUND_ROBIN);
             *simulation_quantum = calculate_quantum(*process, quantum);
         }
-        else if (*simulation_quantum == 0 && get_running_time(*process) != 0) {
+        else if (*simulation_quantum == 0 && get_running_time(*process) != 0 && length(ready_queue) != 0) {
+            printf("\t[SCHEDULER INTERRUPCIÓN] %s\n", (*process)->name);
             update_state(*process, READY);
             insert_process(ready_queue, *process);
             change_process_if_ready(ready_queue, waiting_list, dead_list, process, *simulation_time, ROUND_ROBIN);

@@ -9,12 +9,6 @@ void put_process_in_ready(  Queue *,
                             Comparison);
 void update_waiting_list(Queue *, Queue *);
 void update_ready_queue(Queue *);
-void change_process_if_ready(   Queue *,
-                                Queue *,
-                                Queue *,
-                                Process **,
-                                int,
-                                Scheduler);
 
 void fcfs_or_random(Queue *,
                     Queue *,
@@ -30,5 +24,3 @@ void round_robin(   Queue *,
                     unsigned int *,
                     unsigned int *,
                     int);
-
-int calculate_quantum(Process *, int);
