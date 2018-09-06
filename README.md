@@ -21,7 +21,7 @@ En el archivo `simulator.c`, linea 8, está la línea `#define RUN_SLOW` que con
 
 ### Read Me
 
-* Hicé una lista ligada como cola de procesos.
+* Hice una lista ligada como cola de procesos.
 * Los procesos son modelados como un `struct` con todos los datos (incluyendo estadísticas).
 * Existen 4 listas con procesos:
     * `processes`: guarda todos los procesos del archivo.
